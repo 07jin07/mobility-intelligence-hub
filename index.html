@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mobility Intelligence Hub - モビリティインテリジェンスハブ</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="app">
+        <!-- Header -->
+        <header class="header">
+            <div class="container">
+                <div class="header__content">
+                    <div class="header__title">
+                        <h1>Mobility Intelligence Hub</h1>
+                        <p class="header__subtitle">モビリティインテリジェンスハブ</p>
+                    </div>
+                    
+                    <div class="header__stats">
+                        <div class="stat-item">
+                            <span class="stat-value" id="total-articles">0</span>
+                            <span class="stat-label">記事数</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-value" id="active-sources">0</span>
+                            <span class="stat-label">情報源</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-value" id="last-update">--:--</span>
+                            <span class="stat-label">最終更新</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Navigation -->
+        <nav class="nav">
+            <div class="container">
+                <div class="nav__tabs">
+                    <button class="nav__tab nav__tab--active" data-tab="dashboard">ダッシュボード</button>
+                    <button class="nav__tab" data-tab="mece">MECE分類</button>
+                    <button class="nav__tab" data-tab="sdv">SDV詳細</button>
+                    <button class="nav__tab" data-tab="analytics">分析</button>
+                    <button class="nav__tab" data-tab="sources">RSS情報源</button>
+                </div>
+                
+                <div class="nav__controls">
+                    <div class="search-box">
+                        <input type="text" id="search-input" placeholder="記事を検索..." class="form-control">
+                    </div>
+                    <button id="refresh-btn" class="btn btn--secondary">更新</button>
+                    <button id="export-btn" class="btn btn--outline">エクスポート</button>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="main">
+            <div class="container">
+                <!-- Dashboard Tab -->
+                <div id="dashboard" class="tab-content tab-content--active">
+                    <div class="dashboard">
+                        <div class="dashboard__filters">
+                            <select id="category-filter" class="form-control">
+                                <option value="">全カテゴリ</option>
+                                <option value="A">A: 政策・規制</option>
+                                <option value="B">B: 技術・製品</option>
+                                <option value="C">C: 市場・事業</option>
+                                <option value="D">D: 社会・環境</option>
+                            </select>
+                            
+                            <select id="date-filter" class="form-control">
+                                <option value="">全期間</option>
+                                <option value="today">今日</option>
+                                <option value="week">過去1週間</option>
+                                <option value="month">過去1ヶ月</option>
+                            </select>
+                        </div>
+                        
+                        <div id="articles-container" class="articles-grid">
+                            <!-- Articles will be dynamically loaded here -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- MECE Categories Tab -->
+                <div id="mece" class="tab-content">
+                    <div class="mece-categories">
+                        <h2>MECE分類システム</h2>
+                        <div class="mece-grid" id="mece-grid">
+                            <!-- MECE categories will be dynamically loaded -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SDV Deep Dive Tab -->
+                <div id="sdv" class="tab-content">
+                    <div class="sdv-section">
+                        <h2>SDV (Software-Defined Vehicle) 詳細分類</h2>
+                        <div class="sdv-layers" id="sdv-layers">
+                            <!-- SDV layers will be dynamically loaded -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Analytics Tab -->
+                <div id="analytics" class="tab-content">
+                    <div class="analytics">
+                        <h2>分析ダッシュボード</h2>
+                        
+                        <div class="analytics-grid">
+                            <div class="chart-container">
+                                <h3>カテゴリ別記事分布</h3>
+                                <canvas id="category-chart" height="300"></canvas>
+                            </div>
+                            
+                            <div class="chart-container">
+                                <h3>公開頻度タイムライン</h3>
+                                <canvas id="timeline-chart" height="300"></canvas>
+                            </div>
+                            
+                            <div class="chart-container">
+                                <h3>情報源別記事数</h3>
+                                <canvas id="sources-chart" height="300"></canvas>
+                            </div>
+                            
+                            <div class="recent-activity">
+                                <h3>最近のアクティビティ</h3>
+                                <div id="activity-feed" class="activity-feed">
+                                    <!-- Recent activity will be loaded here -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- RSS Sources Tab -->
+                <div id="sources" class="tab-content">
+                    <div class="sources-section">
+                        <div class="sources-header">
+                            <h2>RSS情報源管理</h2>
+                            <button id="add-source-btn" class="btn btn--primary">新しい情報源を追加</button>
+                        </div>
+                        
+                        <div id="sources-list" class="sources-list">
+                            <!-- RSS sources will be dynamically loaded -->
+                        </div>
+                        
+                        <!-- Add Source Modal -->
+                        <div id="add-source-modal" class="modal hidden">
+                            <div class="modal__backdrop">
+                                <div class="modal__content">
+                                    <div class="modal__header">
+                                        <h3>新しいRSS情報源を追加</h3>
+                                        <button id="close-modal-btn" class="btn btn--outline btn--sm">×</button>
+                                    </div>
+                                    
+                                    <form id="add-source-form" class="modal__body">
+                                        <div class="form-group">
+                                            <label class="form-label">情報源名</label>
+                                            <input type="text" id="source-name" class="form-control" required>
+                                        </div>
+                                        
+                                        <div class="form-group">
+                                            <label class="form-label">RSS URL</label>
+                                            <input type="url" id="source-url" class="form-control" required>
+                                        </div>
+                                        
+                                        <div class="form-group">
+                                            <label class="form-label">カテゴリ</label>
+                                            <select id="source-category" class="form-control" required>
+                                                <option value="">選択してください</option>
+                                                <option value="A1">A1: 国内政策</option>
+                                                <option value="A2">A2: 国際政策</option>
+                                                <option value="B1">B1: SDV</option>
+                                                <option value="B2">B2: 自動運転・ADAS</option>
+                                                <option value="B3">B3: 電動化</option>
+                                                <option value="C1">C1: 自動車メーカー動向</option>
+                                                <option value="C2">C2: モビリティサービス</option>
+                                                <option value="C3">C3: サプライチェーン</option>
+                                                <option value="D1">D1: 社会課題</option>
+                                                <option value="D2">D2: サステナビリティ</option>
+                                            </select>
+                                        </div>
+                                        
+                                        <div class="form-group">
+                                            <label class="form-label">説明</label>
+                                            <textarea id="source-description" class="form-control" rows="3"></textarea>
+                                        </div>
+                                    </form>
+                                    
+                                    <div class="modal__footer">
+                                        <button type="submit" form="add-source-form" class="btn btn--primary">追加</button>
+                                        <button id="cancel-modal-btn" class="btn btn--secondary">キャンセル</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
