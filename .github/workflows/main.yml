@@ -1,0 +1,3 @@
+# .github/workflows/ ディレクトリに配置
+cp github-actions-deploy.yml .github/workflows/deploy.yml
+cp rss-fetch-daily.yml .github/workflows/
